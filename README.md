@@ -1,15 +1,17 @@
-# Credit Card Fraud Detection
+# **Credit Card Fraud Detection**
 
-## Overview
-This repository contains implementations of **credit card fraud detection** using two different models:
+## **Overview**
+This repository implements **credit card fraud detection** using three different models:
 1. **Logistic Regression (`CreditCard.ipynb`)**
 2. **K-Nearest Neighbors (KNN) (`CreditCard2.ipynb`)**
+3. **Random Forest Classifier with Hyperparameter Tuning (`CreditCard_RCF.ipynb`)** 
 
-Both models aim to classify fraudulent transactions from an **imbalanced dataset**, using techniques like **class weighting, downsampling, and stratified cross-validation** to improve performance.
+Each model is designed to classify fraudulent transactions from an **imbalanced dataset**, using techniques like **resampling, SMOTE, stratified cross-validation, and hyperparameter tuning** to enhance performance.
 
 ---
-## Dataset
-The dataset used is `creditcard.csv`, which consists of **284,807 transactions**, out of which **only 492 are fraudulent** (~0.172% of all transactions). Since this is a highly imbalanced dataset, we employ **various resampling and balancing techniques**.
+
+## **Dataset**
+The dataset used is `creditcard.csv`, consisting of **284,807 transactions**, where **only 492 are fraudulent** (~0.172%). Due to this imbalance, we employ **various resampling techniques** like **downsampling, SMOTE (Synthetic Minority Over-Sampling), and class weighting**.
 
 ### **Features:**
 - `Time`: Time elapsed since the first transaction.
@@ -18,59 +20,73 @@ The dataset used is `creditcard.csv`, which consists of **284,807 transactions**
 - `Class`: **Target variable** (1 = Fraud, 0 = Non-fraud).
 
 ---
-## **Approach & Improvements**
+
+## **Approach & Model Comparison**
 
 ### **1️⃣ Logistic Regression Model (`CreditCard.ipynb`)**
-- Used **class_weight='balanced'** to automatically adjust weights inversely proportional to class frequency.
+- Used **class_weight='balanced'** to adjust for class imbalance.
 - Applied **Stratified K-Fold Cross-Validation**.
 - **Results:**
   - **F1-Score (Fraud):** 0.10
   - **Mean CV Accuracy:** 97.31%
 
 ### **2️⃣ K-Nearest Neighbors (KNN) Model (`CreditCard2.ipynb`)**
-- **Downsampling:** Limited the majority class to **only one-third** of the minority class.
-- **Feature Scaling:** Applied **Min-Max Scaling** to improve KNN performance.
-- **Stratified Cross-Validation:** Helped boost model performance by ~4-5%.
+- **Downsampling**: Limited the majority class to **only one-third** of the minority class.
+- **Feature Scaling**: Applied **Min-Max Scaling** for better KNN performance.
+- **Stratified Cross-Validation** boosted performance by **~4-5%**.
 - **Results:**
-  - **F1-Score (Fraud):** **0.91** (Significant improvement from previous model)
-  - **Mean CV F1-Score:** 0.9106
+  - **F1-Score (Fraud):** **0.91**  
+  - **Mean CV F1-Score:** 0.9106  
 
-### **🔍 Key Improvements in `CreditCard2.ipynb`**
+### **3️⃣ Random Forest Classifier with Hyperparameter Tuning (`CreditCard_RCF.ipynb`)** 🚀 *Best Performing Model!*
+- **Step 1:** Took **30% of the dataset** while maintaining fraud/non-fraud ratio using stratified sampling.  
+- **Step 2:** **Split into train-test sets before applying SMOTE** to prevent data leakage.  
+- **Step 3:** Applied **SMOTE only on the training set** to balance the fraud class.  
+- **Step 4:** Used **RandomizedSearchCV with Stratified K-Fold (5 splits)** for hyperparameter tuning.  
+- **Step 5:** Evaluated the final model on the **real-world imbalanced test set**.  
+
+#### **Best Hyperparameters Found**:
+{'n_estimators': 150, 'max_depth': 15, 'criterion': 'log_loss', 'bootstrap': True}
+Results (After Hyperparameter Tuning)
+Accuracy: 99.98%
+Mean F1-Score (Fraud) from Cross-Validation: 0.9811
+F1-Score on Final Test Set: 0.84
+Confusion Matrix:
+
+[17056     6]
+ [    3    24]]
+
+### **🔍 Model Performance Comparison**
 | Model | Class Balancing | Algorithm | Mean F1-Score (Fraud) |
 |--------|---------------|-----------|------------------------|
 | Logistic Regression | Class Weighting | Logistic Regression | **0.10** |
-| KNN (New) | Downsampling & Stratified CV | K-Nearest Neighbors | **0.91** (Huge improvement) |
-
+| KNN | Downsampling & Stratified CV | K-Nearest Neighbors | **0.91** |
+| **Random Forest (New)** | SMOTE & RandomizedSearchCV | **Random Forest Classifier** | **0.9811 (CV) / 0.84 (Final Test)** |
 ---
-## **How to Run the Notebooks**
-### **Requirements**
-Make sure you have Python 3.9+ and the required libraries installed:
-```bash
-pip install pandas numpy scikit-learn matplotlib seaborn
-```
+#### Requirements
+Ensure you have Python 3.9+ and the required libraries installed:
 
-### **Running the Notebooks**
-1. Download the dataset (`creditcard.csv`) and place it in the project folder.
-2. Open Jupyter Notebook:
-```bash
-jupyter notebook
-```
-3. Run either of the two models:
-   - `CreditCard.ipynb` (Logistic Regression)
-   - `CreditCard2.ipynb` (KNN with Downsampling & Stratified CV)
+pip install pandas numpy scikit-learn imbalanced-learn matplotlib seaborn
+Running the Notebooks
 
----
-## **Challenges & Future Work**
-✅ Even with KNN, detecting fraud is difficult due to class imbalance. Future improvements include:
-- **SMOTE (Synthetic Minority Over-Sampling Technique)** to generate synthetic fraud samples.
-- **Exploring alternative models** like Random Forest, XGBoost, or Neural Networks.
-- **Hyperparameter tuning** for KNN and Logistic Regression to improve precision.
+To run any of the models:
 
----
-## **Acknowledgments**
-The dataset is sourced from Kaggle. Special thanks to the **scikit-learn community** for their excellent documentation and resources.
+CreditCard.ipynb → Logistic Regression
+CreditCard2.ipynb → KNN with Downsampling & Stratified CV
+CreditCard_RCF.ipynb → Random Forest with SMOTE & Hyperparameter Tuning
 
----
 
-**🚀 If you find this project useful, feel free to ⭐ this repository!**
+Challenges & Future Work
+✅ Despite improvements, fraud detection remains challenging due to class imbalance. Future enhancements include:
+
+Ensemble Learning: Combining models like XGBoost, LightGBM, or Neural Networks.
+
+Feature Engineering: Deriving additional fraud-specific features.
+
+Advanced Sampling Techniques: Testing ADASYN or Tomek Links for better balancing.
+
+Acknowledgments
+
+Dataset sourced from Kaggle. Special thanks to the scikit-learn and imbalanced-learn communities for providing excellent tools for imbalanced classification.
+
 
